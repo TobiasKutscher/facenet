@@ -199,20 +199,24 @@ class InceptionResnetV1(nn.Module):
             initialized. (default: {None})
         dropout_prob {float} -- Dropout probability. (default: {0.6})
     """
-    def __init__(self, pretrained=None, classify=False, num_classes=None, dropout_prob=0.6, device=None):
+    def __init__(self, pretrained=None, classify=False, num_classes=None, dropout_prob=0.6, device=None, custom_model_path=None):
         super().__init__()
 
         # Set simple attributes
         self.pretrained = pretrained
         self.classify = classify
         self.num_classes = num_classes
+        self.custom_model_path=custom_model_path
 
         if pretrained == 'vggface2':
             tmp_classes = 8631
         elif pretrained == 'casia-webface':
             tmp_classes = 10575
+        elif pretrained == 'custom':
+            tmp_classes = self.num_classes
         elif pretrained is None and self.classify and self.num_classes is None:
             raise Exception('If "pretrained" is not specified and "classify" is True, "num_classes" must be specified')
+        
 
 
         # Define layers
@@ -257,7 +261,11 @@ class InceptionResnetV1(nn.Module):
         self.last_linear = nn.Linear(1792, 512, bias=False)
         self.last_bn = nn.BatchNorm1d(512, eps=0.001, momentum=0.1, affine=True)
 
-        if pretrained is not None:
+        if pretrained is 'vggface2':
+            self.logits = nn.Linear(512, tmp_classes)
+            load_weights(self, pretrained)
+            
+        if pretrained is 'custom':
             self.logits = nn.Linear(512, tmp_classes)
             load_weights(self, pretrained)
 
@@ -314,6 +322,8 @@ def load_weights(mdl, name):
     """
     if name == 'vggface2':
         path = 'https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180402-114759-vggface2.pt'
+    if name == 'custom':
+        path = self.custom_model_path
     elif name == 'casia-webface':
         path = 'https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180408-102900-casia-webface.pt'
     else:
