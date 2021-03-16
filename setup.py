@@ -5,7 +5,7 @@ VERSION = '2.5.2'
 AUTHOR = 'Tim Esler'
 EMAIL = 'tim.esler@gmail.com'
 DESCRIPTION = 'Pretrained Pytorch face detection and recognition models'
-GITHUB_URL = 'https://github.com/timesler/facenet-pytorch'
+GITHUB_URL = 'https://github.com/TobiasKutscher/facenet.git'
 
 parent_dir = os.path.dirname(os.path.realpath(__file__))
 import_name = os.path.basename(parent_dir)
